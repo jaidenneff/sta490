@@ -5,19 +5,20 @@
     <meta charset="utf-8" />
     <meta name="author" content=" Jaiden Neff &amp; Josh Grant " />
     <script src="MLR-Group-Presentation_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer01.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
 .title[
-# <font size = 7 color = "Purple">Multiple Linear Regression</font>
+# <font size = 7 color = "White">Multiple Linear Regression</font>
 ]
 .author[
-### <font size = 5 color = "Purple"> Jaiden Neff &amp; Josh Grant </font>
+### <font size = 5 color = "White"> Jaiden Neff &amp; Josh Grant </font>
 ]
 .institute[
-### <font size = 6 color = "Purple">West Chester University of Pennsylvania</font><br>
+### <font size = 6 color = "White">West Chester University of Pennsylvania</font><br>
 ]
 
 ---
@@ -74,7 +75,7 @@ The primary question is to identify the association between the hand length (y) 
 
 
 
-&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-2-1.png" width="600px" style="display: block; margin: auto;" /&gt;
+&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-2-1.png" width="700px" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -83,14 +84,14 @@ The primary question is to identify the association between the hand length (y) 
 
 
 
-&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-3-1.png" width="600px" style="display: block; margin: auto;" /&gt;
+&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-3-1.png" width="700px" style="display: block; margin: auto;" /&gt;
 
 ---
 
 &lt;h2 align="center"&gt; Foot Length vs Hand Length&lt;/h2&gt;
 
 
-&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-4-1.png" width="600px" style="display: block; margin: auto;" /&gt;
+&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-4-1.png" width="700px" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -107,6 +108,7 @@ Table: Statistics of Regression Coefficients
 |genderFemale | -1.0803455|  1.7963585| -0.6014086|          0.5484757|
 |height       |  0.1093853|  0.0133900|  8.1691775|          0.0000000|
 |footLen      |  0.0559712|  0.0608566|  0.9197221|          0.3591947|
+
 
 ---
 
@@ -149,14 +151,18 @@ Table: Statistics of Regression Coefficients
 
 
 ---
-#Regression Analysis
+
+&lt;h2 align="center"&gt; Regression Analysis  &lt;/h2&gt;
+
 &lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 
 ---
 
-# Goodeness Of Fit
+&lt;h2 align="center"&gt; Goodeness Of Fit  &lt;/h2&gt;
+
+
 
 
 
@@ -169,27 +175,45 @@ Table: Goodness-of-fit Measures of Candidate Models
 |sqrt.length.log.dist |    8.1141691| 0.7645480| 0.7598701|  4|  -449.2211|  -437.0474|    8.8925687|
 |log.length           |    0.1641709| 0.7637833| 0.7590903|  4| -1053.7922| -1041.6185|    0.1798398|
 ---
-#Bootstrapping regression
+
+&lt;h2 align="center"&gt; Bootstrapping regression &lt;/h2&gt;
+
 
 
 &lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-14-1.png" width="750px" style="display: block; margin: auto;" /&gt;
 
 ---
-## Bootstrapping Residuals
+
+&lt;h2 align="center"&gt; Bootstrapping Residuals  &lt;/h2&gt;
+
 
 
 Table: Regression Coefficient Matrix
 
 |             |Estimate |Std. Error |t value |Pr(&gt;&amp;#124;t&amp;#124;) |btc.ci.95            |
 |:------------|:--------|:----------|:-------|:------------------|:--------------------|
-|(Intercept)  |4.3042   |0.0838     |51.3727 |0.0000             |[ 4.0698 ,  4.5336 ] |
+|(Intercept)  |4.3042   |0.0838     |51.3727 |0.0000             |[ 4.0669 ,  4.5256 ] |
 |height       |0.0005   |0.0001     |8.0735  |0.0000             |[ 4e-04 ,  7e-04 ]   |
-|footLen      |0.0003   |0.0003     |1.0315  |0.3040             |[ -7e-04 ,  0.0012 ] |
-|genderFemale |-0.0057  |0.0091     |-0.6314 |0.5287             |[ -0.029 ,  0.018 ]  |
+|footLen      |0.0003   |0.0003     |1.0315  |0.3040             |[ -7e-04 ,  0.0011 ] |
+|genderFemale |-0.0057  |0.0091     |-0.6314 |0.5287             |[ -0.0289 ,  0.016 ] |
 
 ---
 
-## Final Model
+&lt;h2 align="center"&gt; log transformation residual plot  &lt;/h2&gt;
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="MLR-Group-Presentation_files/figure-html/unnamed-chunk-16-1.png" alt="Residual plots of the full model" width="600px" /&gt;
+&lt;p class="caption"&gt;Residual plots of the full model&lt;/p&gt;
+&lt;/div&gt;
+
+
+
+---
+
+&lt;h2 align="center"&gt; Final Model  &lt;/h2&gt;
+
+
 
 
 
@@ -197,7 +221,9 @@ $$
 log(handLen) = 4.3042058 +(0.0005444* height) + (0.0003162 *footLen) - (0.0057154* genderFemale)
 $$
 ---
-# Final Thoughts
+
+&lt;h2 align="center"&gt; Final Thoughts &lt;/h2&gt;
+
 
 • The log transformation Is the best model for determining correlation between hand length 
 and closely related variables
