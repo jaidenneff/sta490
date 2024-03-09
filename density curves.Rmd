@@ -1,0 +1,285 @@
+---
+title: "Exploritory Data Analysis for Loan Data"
+author: "Jaiden Neff"
+date: ""
+output:
+  html_document: 
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    fig_width: 6
+    fig_height: 4
+    fig_caption: yes
+    number_sections: yes
+    theme: readable
+  pdf_document: 
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    number_sections: yes
+    fig_width: 5
+    fig_height: 4
+  word_document: 
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    keep_md: yes
+---
+
+
+```{=html}
+<style type="text/css">
+h1.title {
+  font-size: 20px;
+  color: DarkRed;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+  text-align: center;
+}
+h1 { /* Header 3 - and the author and data headers use this too  */
+    font-size: 22px;
+    font-family: "Times New Roman", Times, serif;
+    color: darkred;
+    text-align: center;
+}
+h2 { /* Header 3 - and the author and data headers use this too  */
+    font-size: 18px;
+    font-family: "Times New Roman", Times, serif;
+    color: navy;
+    text-align: left;
+}
+
+h3 { /* Header 3 - and the author and data headers use this too  */
+    font-size: 15px;
+    font-family: "Times New Roman", Times, serif;
+    color: navy;
+    text-align: left;
+}
+
+h4 { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+    font-family: "Times New Roman", Times, serif;
+    color: darkred;
+    text-align: left;
+}
+</style>
+```
+
+
+# Introduction
+
+### loading in the data 
+
+````{verbatim}
+
+LIBNAME sql "/home/u63213941/STA490";
+
+filename dat01 url "https://pengdsci.github.io/datasets/SBAloan/w06-SBAnational01.csv";
+filename dat02 url "https://pengdsci.github.io/datasets/SBAloan/w06-SBAnational02.csv";
+filename dat03 url "https://pengdsci.github.io/datasets/SBAloan/w06-SBAnational03.csv";
+filename dat04 url "https://pengdsci.github.io/datasets/SBAloan/w06-SBAnational04.csv";
+filename dat05 url "https://pengdsci.github.io/datasets/SBAloan/w06-SBAnational05.csv";
+filename dat06 url "https://pengdsci.github.io/datasets/SBAloan/w06-SBAnational06.csv";
+
+*write a macro to load multiple data files;
+%MACRO IMPORTCSV(in_csv, out_sas);
+PROC IMPORT DATAFILE=&in_csv
+   DBMS=csv
+   OUT=sql.&out_sas
+   REPLACE;
+RUN;
+%MEND;
+
+*call macros to load data files;
+%IMPORTCSV(dat01, nat01);
+%IMPORTCSV(dat02, nat02);
+%IMPORTCSV(dat03, nat03);
+%IMPORTCSV(dat04, nat04);
+%IMPORTCSV(dat05, nat05);
+%IMPORTCSV(dat06, nat06);
+
+*Use proc sql to union data files;
+proc sql;
+    create table sql.natdata as
+    select * from sql.nat01
+    union all
+    select * from sql.nat02
+    union all
+    select * from sql.nat03
+    union all
+    select * from sql.nat04
+    union all
+    select * from sql.nat05
+    union all
+    select * from sql.nat06;
+quit;
+    
+````
+
+# Problem 1 
+
+### Data Cleaning
+
+````{verbatim}
+
+/* Step 1: Remove missing values from MIS_Status */
+proc sql;
+    create table sql.nat_cleaned as
+    select *
+    from sql.natdata
+    where not missing(MIS_Status);
+quit;
+
+/* Step 2: Convert dollar amount variables into numerical variables */
+proc sql;
+    create table sql.nat_cleaned as
+    select *,
+           input(DisbursementGross, comma14.) as nDisbursementGross,
+           input(BalanceGross, comma8.) as nBalanceGross,
+           input(ChgOffPrinGr, comma14.) as nChgOffPrinGr,
+           input(GrAppv, comma14.) as nGrAppv,
+           input(SBA_Appv, comma14.) as nSBA_Appv
+    from sql.nat_cleaned;
+quit;
+
+data sql.nat_cleaned;
+    set sql.nat_cleaned (drop=DisbursementGross BalanceGross ChgOffPrinGr GrAppv SBA_Appv);
+run;
+ quit;
+ 
+````
+ 
+ 
+# Problem 2 
+
+### Combining sparse variables 
+
+````{verbatim}
+ PROC SQL;
+create table sql.nat_state as 
+select*,
+    CASE
+        WHEN BankState IN ('CT', 'ME', 'MA', 'NH', 'RI', 'VT') THEN 'Boston'
+        WHEN BankState IN ('NJ', 'NY') THEN 'New York'
+        WHEN BankState IN ('PA') THEN 'Philadelphia'
+        WHEN BankState IN ('DE', 'DC', 'MD', 'VA', 'WV') THEN 'Richmond'
+        WHEN BankState IN ('AL', 'FL', 'GA', 'NC', 'SC') THEN 'Atlanta'
+        WHEN BankState IN ('KY', 'LA', 'MS', 'TN') THEN 'St. Louis'
+        WHEN BankState IN ('IL', 'IN', 'IA', 'MI', 'MN', 'WI') THEN 'Chicago'
+        WHEN BankState IN ('AR', 'MO', 'OK', 'TX') THEN 'Dallas'
+        WHEN BankState IN ('CO', 'MT', 'UT', 'WY') THEN 'Kansas City'
+        WHEN BankState IN ('AZ', 'CA', 'HI', 'NV') THEN 'San Francisco'
+        WHEN BankState IN ('AK', 'ID', 'OR', 'WA') THEN 'Seattle'
+        ELSE 'Other'
+    END AS FederalReserveRegion
+FROM
+    sql.nat_cleaned
+GROUP BY
+    FederalReserveRegion;
+
+QUIT;
+````
+
+
+# Problem 3  
+
+### Defult Rates 
+
+````{verbatim}
+PROC SQL;
+SELECT
+    FederalReserveRegion,
+    COUNT(*) AS TotalObservations,
+    COUNT(*) * 1.0 / (SELECT COUNT(*) FROM  sql.nat_bank) AS CategoryRate
+FROM
+    sql.nat_bank
+GROUP BY
+    FederalReserveRegion;
+QUIT;
+
+````
+
+
+# Problem 4
+
+### Categorical Subpopulations
+ 
+````{verbatim}   
+PROC SQL;
+create table sql.nat_grappv as
+SELECT *,
+       
+       CASE
+           WHEN nGrAppv <= 15000.00 THEN 'Very Low'
+           WHEN nGrAppv BETWEEN 15000.01 AND 30000.00 THEN 'Low'
+           WHEN nGrAppv BETWEEN 30000.01 AND 70000.00 THEN 'Medium'
+           WHEN nGrAppv BETWEEN 70000.01 AND 100000.00 THEN 'High'
+           ELSE 'Very High'
+       END AS GrAppv_Category
+FROM sql.nat_cleaned;
+QUIT;   
+    
+````
+
+# Problem 5 
+
+### Density Graphs 
+
+```{r}
+loan <- read.csv("https://raw.githubusercontent.com/jaidenneff/sta490/main/NAT_GRAPPV.csv", header = TRUE)
+
+setwd("/Users/jaidenneff/Desktop/STA490") 
+
+loan2 <- read.csv("NAT_GRAPPV.csv")
+```
+
+
+```{r}
+
+library(ggplot2)
+
+
+
+# Filter out missing or infinite values from nSBA_Appv
+
+cleaned_data <- loan[loan$nSBA_Appv<150000, ]
+
+# Create density plot using ggplot2 with facets
+ggplot(cleaned_data, aes(x = nSBA_Appv, color = GrAppv_Category)) +
+  geom_density() +
+  labs(x = "nSBA_Appv", y = "Density", 
+       title = "Density Curves of nSBA_Appv for Gr Apprv") +
+  theme_minimal() +
+  facet_wrap(~ GrAppv_Category, scales = "free")
+
+
+```
+
+
+```{r}
+
+
+library(ggplot2)
+
+
+
+# Create density plot using ggplot2
+ggplot(cleaned_data, aes(x = nSBA_Appv, color = GrAppv_Category, linetype = GrAppv_Category)) +
+  geom_density() +
+  labs(x = "nSBA_Appv", y = "Density", 
+       title = "Density Curves of nSBA_Appv for Each Gr Appv") +
+  theme_minimal() +
+  scale_linetype_manual(values = rep(1, length(unique(cleaned_data$GrAppv_Category)))) +
+  scale_color_manual(values = rainbow(length(unique(cleaned_data$GrAppv_Category)))) +
+  theme(legend.position="bottom")
+```
