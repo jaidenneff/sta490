@@ -1,0 +1,296 @@
+---
+title: "Sampling Analysis for Loan Data"
+author: "Jaiden Neff"
+date: ""
+output:
+  html_document: 
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    fig_width: 6
+    fig_height: 4
+    fig_caption: yes
+    number_sections: yes
+    theme: readable
+  pdf_document: 
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    number_sections: yes
+    fig_width: 5
+    fig_height: 4
+  word_document: 
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    keep_md: yes
+---
+
+
+```{=html}
+<style type="text/css">
+h1.title {
+  font-size: 20px;
+  color: DarkRed;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+  text-align: center;
+}
+h1 { /* Header 3 - and the author and data headers use this too  */
+    font-size: 22px;
+    font-family: "Times New Roman", Times, serif;
+    color: darkred;
+    text-align: center;
+}
+h2 { /* Header 3 - and the author and data headers use this too  */
+    font-size: 18px;
+    font-family: "Times New Roman", Times, serif;
+    color: navy;
+    text-align: left;
+}
+
+h3 { /* Header 3 - and the author and data headers use this too  */
+    font-size: 15px;
+    font-family: "Times New Roman", Times, serif;
+    color: navy;
+    text-align: left;
+}
+
+h4 { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+    font-family: "Times New Roman", Times, serif;
+    color: darkred;
+    text-align: left;
+}
+</style>
+```
+
+
+```{r setup, include=FALSE}
+# code chunk specifies whether the R code, warnings, and output 
+# will be included in the output files.
+library(knitr)
+library(lessR) 
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE,  
+                      result = TRUE    
+                      )   
+```
+
+# Intro for Sampling Methods
+
+### Simple Random Sampling (SRS):
+
+In simple random sampling, each individual in the population has an equal chance of being selected, and the selection of one individual is independent of the selection of others.
+
+Why use it: Simple random sampling is considered the gold standard for sampling methods because it ensures that each unit in the population has an equal chance of being selected. It's useful when you want to avoid bias and ensure that your sample is representative of the population as a whole.
+
+### Systematic Sampling:
+
+Systematic sampling involves selecting every k-th element from a list or sampling frame after randomly selecting a starting point. The sampling interval (k) is determined based on the desired sample size and the size of the population.
+ 
+Why use it: Systematic sampling is simple to implement and often more efficient than simple random sampling because it ensures that the sample is spread evenly across the population. It's useful when there's a list or sequence of elements from which to sample, such as customer lists or patient records.
+
+### Stratified Sampling: 
+
+In stratified sampling, the population is divided into distinct subgroups or strata based on certain characteristics that are relevant to the research. Samples are then independently drawn from each stratum.
+
+Why use it: Stratified sampling ensures that each subgroup of interest is represented in the sample proportionally to its presence in the population. This can help improve the precision and representativeness of estimates, especially when certain subgroups are underrepresented in the population.
+
+
+### Cluster Sampling:
+
+ In cluster sampling, the population is divided into clusters or groups, and a random sample of clusters is selected. Then, all individuals within the selected clusters are included in the sample.
+ 
+Why use it: Cluster sampling can be more practical and cost-effective when it's difficult or impractical to sample individuals directly. It's particularly useful when the population is geographically dispersed or when it's easier to access clusters rather than individuals directly.
+
+
+
+
+
+
+## data 
+
+```{r}
+loan <- read.csv("https://raw.githubusercontent.com/jaidenneff/sta490/main/NAT_GRAPPV.csv", header = TRUE)
+
+setwd("/Users/jaidenneff/Desktop/STA490") 
+
+loan2 <- read.csv("NAT_GRAPPV.csv")
+
+loan3 <- read.csv("NAT_STATE.csv")
+```
+
+
+# Loan Default Rates
+
+We now find the loan default rates by industry defined by the stratification variable Federal Reserve region. The loan default status can be defined by the variable MIS_Status.
+
+```{r}
+# Recode MIS_Status variable to binary
+loan3$DefaultStatus <- ifelse(loan3$MIS_Status == "PIF", 1, 0)
+
+# Calculate the table of defaults and non-defaults by Federal Reserve region
+x.table <- table(loan3$FederalReserveRegion, loan3$MIS_Status)
+
+# Extract the counts of non-defaults and defaults
+no.default <- x.table[, 1]
+default <- x.table[, 2]
+
+# Calculate default rates
+default.rate <- round(100 * default / (default + no.default), 1)
+
+# Create a data frame to store the results
+default.status.rate <- data.frame(
+  FederalReserveRegion = rownames(x.table),
+  NoDefault = no.default,
+  Default = default,
+  DefaultRate = default.rate
+)
+
+# Print the results in a table
+kable(default.status.rate)
+
+
+
+```
+
+## Study Population
+
+Based on the above frequency distribution of the federal reserve regions i have decided to keep them all in the sample 
+
+```{r}
+del.categories = c() 
+# categories to be deleted in 
+# the original population
+del.obs.status = !(loan3$FederalReserveRegion %in% del.categories) 
+# deletion status. ! negation operator
+study.pop = loan3[del.obs.status,]  # excluding the categories
+kable(t(table(study.pop$FederalReserveRegion))) # Checking correctness operation
+```
+
+So we have defined our study population!
+
+# Simple Random Sampling
+
+We define a sampling list and add it to the study population.
+
+```{r}
+study.pop$sampling.frame = 1:length(study.pop$nGrAppv)   
+# sampling list
+# names(study.pop)                                     
+# checking the sampling list variable
+sampled.list = sample(1:length(study.pop$nGrAppv), 4000) 
+# sampling the list
+SRS.sample = study.pop[sampled.list,]                  
+# extract the sampling units (observations)
+## dimension check
+dimension.SRS = dim(SRS.sample)
+names(dimension.SRS) = c("Size", "Var.count")
+kable(t(dimension.SRS))   # checking the sample size
+```
+
+
+
+# Systematic sampling
+
+```{r}
+jump.size = dim(study.pop)[1]%/%4000  
+# find the jump size in the systematic sampling
+# jump.size
+rand.starting.pt=sample(1:jump.size,1) # find the random starting value
+sampling.id = seq(rand.starting.pt, dim(study.pop)[1], jump.size)  # sampling IDs
+#length(sampling.id)
+sys.sample=study.pop[sampling.id,]    
+# extract the sampling units of systematic samples
+sys.Sample.dim = dim(sys.sample)
+names(sys.Sample.dim) = c("Size", "Var.count")
+kable(t(sys.Sample.dim))
+```
+
+
+# Stratified Sampling
+
+We take an SRS from each stratum. The sample size should be approximately proportional to the size of the corresponding stratum.
+
+First, we calculate the SRS size for each stratum and then take the SRS from the corresponding stratum.
+
+```{r}
+freq.table = table(study.pop$FederalReserveRegion)  # frequency table of strNAICS
+rel.freq = freq.table/sum(freq.table)   # relative frequency 
+strata.size = round(rel.freq*4000)      # strata size allocation
+strata.names=names(strata.size)         # extract strNAICS names for accuracy checking
+```
+
+```{r}
+kable(t(strata.size))  # make a nice-looking table using kable().
+```
+
+In the following code chunk, we take stratified samples.
+
+```{r}
+
+str(study.pop)
+
+strata.sample = study.pop[1,]    # create a reference data frame
+strata.sample$add.id = 1   # add a temporary ID to because in the loop
+                           # i =2 testing a single iteration
+for (i in 1:length(strata.names)){
+   ith.strata.names = strata.names[i]   # extract data frame names
+   ith.strata.size = strata.size[i]     # allocated stratum size
+   # The following code identifies observations to be selected
+   ith.sampling.id = which(study.pop$FederalReserveRegion==ith.strata.names) 
+   ith.strata = study.pop[ith.sampling.id,]  # i-th stratified population
+   ith.strata$add.id = 1:dim(ith.strata)[1]  # add sampling list/frame
+   # The following code generates a subset of random ID
+   ith.sampling.id = sample(1:dim(ith.strata)[1], ith.strata.size) 
+   ## Create a selection status -- pay attention to the operator: %in% 
+   ith.sample =ith.strata[ith.strata$add.id %in%ith.sampling.id,]
+   ## dim(ith.sample)         $ check the sample
+   strata.sample = rbind(strata.sample, ith.sample)  # stack all data frame!
+ }
+ # dim(strata.sample)
+ strat.sample.final = strata.sample[-1,]  # drop the temporary stratum ID
+ kable(head(strat.sample.final))         # accuracy check!
+```
+
+
+
+# Cluster Sampling 
+
+Using the cluster sampling method we are using Zip codes to break up the data into clusters 
+
+```{r}
+
+
+library(survey)
+
+
+# Create survey design object
+cluster_design <- svydesign(ids = ~Zip, data = loan2)
+
+# Specify your sampling strategy (e.g., simple random sampling)
+cluster_sample <- svydesign(ids = ~Zip, data = loan2)
+
+print(cluster_sample)
+
+# Estimate population parameters or perform analysis
+cluster_means <- svymean(~nGrAppv, cluster_design)
+
+# View results
+print(cluster_means)
+
+```
+
+
+
