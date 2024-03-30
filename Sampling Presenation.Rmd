@@ -135,12 +135,12 @@ style_duo_accent(
 
 <h2 align="center"> Data Description </h2>
 
-![](datainfo1.png)          
+![](https://jaidenneff.github.io/sta490/loan/datainfo1.png)          
 
 ---
 <h2 align="center"> Data Description </h2>
 
-![](datainfo2.png) 
+![](https://jaidenneff.github.io/sta490/loan/datainfo2.png) 
 ---
 
 <h2 align="center"> Data Cleaning </h2>
@@ -238,7 +238,7 @@ Why use it:
 Here you can see a better representation of what happens in each sampling method.  
 
 
-![](SamplingPlans.png)
+![](https://jaidenneff.github.io/sta490/loan/SamplingPlans.png)
 
 
 ---
@@ -249,15 +249,33 @@ Here you can see a better representation of what happens in each sampling method
 
 Here We find the loan default rates by region defined by the stratification variable Federal Reserve region. The loan default status can be defined by the variable MIS_Status.
 
+
+
 ```{r}
-loan <- read.csv("https://raw.githubusercontent.com/jaidenneff/sta490/main/NAT_GRAPPV.csv", header = TRUE)
+loan01 = read.csv("https://jaidenneff.github.io/sta490/loan/subloan0.1.csv", header = TRUE)[, -1]
+loan02 = read.csv("https://jaidenneff.github.io/sta490/loan/subloan0.2.csv", header = TRUE)[, -1]
+loan03 = read.csv("https://jaidenneff.github.io/sta490/loan/subloan0.3.csv", header = TRUE)[, -1]
+loan04 = read.csv("https://jaidenneff.github.io/sta490/loan/subloan0.4.csv", header = TRUE)[, -1]
+loan05 = read.csv("https://jaidenneff.github.io/sta490/loan/subloan0.5.csv", header = TRUE)[, -1]
+loan06 = read.csv("https://jaidenneff.github.io/sta490/loan/subloan0.6.2.csv", header = TRUE)[, -1]
 
-setwd("/Users/jaidenneff/Desktop/STA490") 
-
-loan2 <- read.csv("NAT_GRAPPV.csv")
-
-loan3 <- read.csv("NAT_STATE.csv")
+loan3 = rbind(loan01, loan02, loan03, loan04, loan05, loan06)
 ```
+
+
+
+
+```{r}
+
+#write.csv(loan3[1:100000,], "/Users/jaidenneff/Desktop/STA490/subloan0.1.csv")
+#write.csv(loan3[100001:200000,], "/Users/jaidenneff/Desktop/STA490/subloan0.2.csv")
+#write.csv(loan3[200001:300000,], "/Users/jaidenneff/Desktop/STA490/subloan0.3.csv")
+#write.csv(loan3[300001:400000,], "/Users/jaidenneff/Desktop/STA490/subloan0.4.csv")
+#write.csv(loan3[400001:500000,], "/Users/jaidenneff/Desktop/STA490/subloan0.5.csv")
+#write.csv(loan3[500001:598499,], "/Users/jaidenneff/Desktop/STA490/subloan0.6.2.csv")
+```
+
+
 
 
 ```{r}
@@ -422,10 +440,10 @@ for (i in 1:length(strata.names)){
 library(survey)
 
 # Create survey design object
-cluster_design <- svydesign(ids = ~Zip, data = loan2)
+cluster_design <- svydesign(ids = ~Zip, data = loan3)
 
 # Specify your sampling strategy (e.g., simple random sampling)
-cluster_sample <- svydesign(ids = ~Zip, data = loan2)
+cluster_sample <- svydesign(ids = ~Zip, data = loan3)
 
 print(cluster_sample)
 
