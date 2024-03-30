@@ -54,12 +54,12 @@ class: center, middle, inverse, title-slide
 
 &lt;h2 align="center"&gt; Data Description &lt;/h2&gt;
 
-![](datainfo1.png)          
+![](https://jaidenneff.github.io/sta490/loan/datainfo1.png)          
 
 ---
 &lt;h2 align="center"&gt; Data Description &lt;/h2&gt;
 
-![](datainfo2.png) 
+![](https://jaidenneff.github.io/sta490/loan/datainfo2.png) 
 ---
 
 &lt;h2 align="center"&gt; Data Cleaning &lt;/h2&gt;
@@ -157,7 +157,7 @@ Why use it:
 Here you can see a better representation of what happens in each sampling method.  
 
 
-![](SamplingPlans.png)
+![](https://jaidenneff.github.io/sta490/loan/SamplingPlans.png)
 
 
 ---
@@ -167,6 +167,15 @@ Here you can see a better representation of what happens in each sampling method
 &lt;h2 align="center"&gt; Loan Default Rates &lt;/h2&gt;
 
 Here We find the loan default rates by region defined by the stratification variable Federal Reserve region. The loan default status can be defined by the variable MIS_Status.
+
+
+
+
+
+
+
+
+
 
 
 
@@ -299,7 +308,7 @@ Here we take a stratified sample using the Federal reserve region that was added
 ```
 ## 1 - level Cluster Sampling design (with replacement)
 ## With (29880) clusters.
-## svydesign(ids = ~Zip, data = loan2)
+## svydesign(ids = ~Zip, data = loan3)
 ```
 
 ```
@@ -338,24 +347,24 @@ To verify this is correct we look at the 29880 clusters with the amount of uniqu
 
 |              | default.rate.pop| default.rate.srs| default.rate.sys| default.rate.str|
 |:-------------|----------------:|----------------:|----------------:|----------------:|
-|Atlanta       |             27.7|             29.3|             28.7|             27.3|
-|Boston        |             17.0|             17.6|             20.9|             16.8|
-|Chicago       |             19.5|             20.7|             17.6|             19.3|
-|Dallas        |             15.5|             13.5|             18.0|             16.2|
-|Kansas City   |             16.3|             16.1|             16.4|             14.6|
-|New York      |             18.4|             17.1|             18.1|             17.5|
-|Philadelphia  |              8.6|             11.0|              6.3|              4.1|
-|Richmond      |             31.7|             29.2|             35.3|             33.0|
-|San Francisco |             23.6|             24.4|             22.6|             22.7|
-|Seattle       |             16.0|             13.3|             17.8|             14.0|
-|St. Louis     |             13.4|             17.0|             12.6|             15.4|
+|Atlanta       |             27.7|             28.2|             31.0|             24.5|
+|Boston        |             17.0|             19.5|             16.6|             15.2|
+|Chicago       |             19.5|             21.8|             20.3|             20.6|
+|Dallas        |             15.5|             11.5|             17.3|             15.6|
+|Kansas City   |             16.3|             17.7|             15.5|             16.2|
+|New York      |             18.4|             16.6|             16.6|             17.5|
+|Philadelphia  |              8.6|             11.7|              7.4|              8.2|
+|Richmond      |             31.7|             34.0|             34.5|             32.3|
+|San Francisco |             23.6|             20.6|             26.4|             23.9|
+|Seattle       |             16.0|             13.4|             12.3|             15.7|
+|St. Louis     |             13.4|             21.7|             21.3|             15.4|
 ---
 
 &lt;h2 align="center"&gt; Plotting the Default Rates &lt;/h2&gt;
 
 
 
-&lt;img src="Sampling-Presenation_files/figure-html/unnamed-chunk-15-1.png" width="100%" /&gt;
+&lt;img src="Sampling-Presenation_files/figure-html/unnamed-chunk-16-1.png" width="100%" /&gt;
 
 
 
