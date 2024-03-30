@@ -1,0 +1,570 @@
+---
+title: '<font size = 7 color = "White">Sampling Plans and Analysis for Loan Data </font>'
+subtitle:
+author: '<font size = 5 color = "White"> Jaiden Neff  </font>'
+institute: '<font size = 6 color = "White">West Chester University of Pennsylvania</font><br> '
+
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer01.css
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+if (!require("knitr")) {
+   install.packages("knitr")
+   library(knitr)
+}
+if (!require("leaflet")) {
+   install.packages("leaflet")
+   library(leaflet)
+}
+if (!require("EnvStats")) {
+   install.packages("EnvStats")
+   library(EnvStats)
+}
+if (!require("MASS")) {
+   install.packages("MASS")
+   library(MASS)
+}
+if (!require("phytools")) {
+   install.packages("phytools")
+   library(phytools)
+}
+if (!require("tidyverse")) {
+   install.packages("tidyverse")
+   library(tidyverse)
+}
+if (!require("nleqslv")) {
+   install.packages("nleqslv")
+   library(nleqslv)
+}
+if (!require("pander")) {
+   install.packages("pander")
+   library(pander)
+}
+if (!require("psych")) {   
+  install.packages("psych")
+   library(psych)
+}
+if (!require("car")) {
+   install.packages("car")
+   library(car)
+}
+if (!require("lubridate")) {
+   install.packages("lubridate")
+   library(lubridate)
+}
+if (!require("ggplot2")) {
+   install.packages("ggplot2")
+   library(ggplot2)
+}
+if (!require("simputation")) {
+   install.packages("simputation")
+   library(simputation)
+}
+if (!require("modelr")) {
+   install.packages("modelr")
+   library(modelr)
+}
+if (!require("MASS")) {
+   install.packages("MASS")
+   library(mass)
+}
+if (!require("pROC")) {
+   install.packages("pROC")
+   library(pROC)
+}
+if (!require("readxl")) {
+   install.packages("readxl")
+   library(readxl)
+}
+if (!require("forecast")) {
+   install.packages("forecast")
+   library(readxl)
+}
+library(xaringanthemer)
+style_duo_accent(
+  primary_color = "#1381B0",
+  secondary_color = "grey",
+  inverse_header_color = "#FFFFFF"
+)
+```
+
+
+
+<h2 align="center"> Table of Contents</h2>
+<BR>
+
+.pull-left[
+- Data Description 
+- Data Cleaning
+   - Description of FRR 
+- Sampling Description
+- Loan Default Rate 
+- Study Population 
+- Simple Random Sample  
+- Systematic Sample
+- Stratified Sample
+- Custer Sample
+- Default Rate 
+- Plot/ Visual Comparison 
+- Final Thoughts
+]
+
+
+
+---
+
+<h2 align="center"> Data Description </h2>
+
+![](datainfo1.png)          
+
+---
+<h2 align="center"> Data Description </h2>
+
+![](datainfo2.png) 
+---
+
+<h2 align="center"> Data Cleaning </h2>
+
+- Removed all missing values from MIS_Status
+- Converted Dollar amount to a numeric variable
+- Wanted to make the info more useful in bank states
+- Took all of the bank states and break them down into the category of Federal Reserve Region 
+- Brake up allows us to look at 12 distinct categories instead of 50 
+- 598,499 observations after cleaning 
+
+
+---
+
+<h2 align="center"> Federal Reserve Regions </h2>
+
+Boston: Connecticut (CT), Maine (ME), Massachusetts (MA), New Hampshire (NH), Rhode Island (RI), Vermont (VT)
+
+New York: New Jersey (NJ), New York (NY)
+
+Philadelphia: Pennsylvania (PA)
+
+Richmond: Delaware (DE), District of Columbia (DC), Maryland (MD), Virginia (VA), West Virginia (WV)
+
+Atlanta: Alabama (AL), Florida (FL), Georgia (GA), North Carolina (NC), South Carolina (SC)
+
+St. Louis: Kentucky (KY), Louisiana (LA), Mississippi (MS), Tennessee (TN)
+
+Chicago: Illinois (IL), Indiana (IN), Iowa (IA), Michigan (MI), Minnesota (MN), Wisconsin (WI)
+
+Dallas: Arkansas (AR), Missouri (MO), Oklahoma (OK), Texas (TX)
+
+Kansas City: Colorado (CO), Montana (MT), Utah (UT), Wyoming (WY), Ohio (OH), North Dakota (ND), South Dakota (SD), Nebraska (NE), Kansas (KS)
+
+San Francisco: Arizona (AZ), California (CA), Hawaii (HI), Nevada (NV)
+
+Seattle: Alaska (AK), Idaho (ID), Oregon (OR), Washington (WA)
+
+Other: States not listed in the above breakdown
+
+
+---
+
+<h2 align="center"> Sampling Type Description </h2>
+
+#### Simple Random Sampling (SRS):
+
+- Equal Chance of selection
+- Each selection is independent from each other
+
+Why use it: 
+- Ensures equal chance of selection 
+- Avoid bias more representative of population as a whole 
+
+
+#### Systematic Sampling:
+
+- Involves selecting every k-th element from a list or sampling frame
+- (k) is determined based on the desired sample size and the size of the population
+ 
+Why use it:
+- Simple and more effective than SRS, Ensures sample is spread evenly across population
+- It's useful when there's a list or sequence of elements from which to sample, such as customer lists or patient records
+
+
+---
+
+<h2 align="center"> Sampling Type Description </h2>
+
+
+#### Stratified Sampling: 
+
+- The population is divided into distinct subgroups or strata based on certain characteristics
+- Samples are then independently drawn from each stratum
+
+Why use it: 
+- Ensures that each subgroup is proportionally represented in the sample 
+- Improve the precision of estimates, especially when certain subgroups are underrepresented
+
+
+#### Cluster Sampling:
+
+- The population is divided into clusters or groups, A random sample of clusters is selected
+- All individuals within the selected clusters are included in the sample
+ 
+Why use it: 
+- Can be more practical and cost-effective when it's difficult or impractical to sample individuals directly
+- Useful when the population is geographically dispersed 
+- Useful when it's easier to access clusters rather than individuals directly.
+
+---
+
+<h2 align="center"> Sampling Visual </h2>
+
+Here you can see a better representation of what happens in each sampling method.  
+
+
+![](SamplingPlans.png)
+
+
+---
+
+--- 
+
+<h2 align="center"> Loan Default Rates </h2>
+
+Here We find the loan default rates by region defined by the stratification variable Federal Reserve region. The loan default status can be defined by the variable MIS_Status.
+
+```{r}
+loan <- read.csv("https://raw.githubusercontent.com/jaidenneff/sta490/main/NAT_GRAPPV.csv", header = TRUE)
+
+setwd("/Users/jaidenneff/Desktop/STA490") 
+
+loan2 <- read.csv("NAT_GRAPPV.csv")
+
+loan3 <- read.csv("NAT_STATE.csv")
+```
+
+
+```{r}
+# Recode MIS_Status variable to binary
+loan3$DefaultStatus <- ifelse(loan3$MIS_Status == "PIF", 0, 1)
+
+# Calculate the table of defaults and non-defaults by Federal Reserve region
+x.table <- table(loan3$FederalReserveRegion, loan3$MIS_Status)
+
+
+# Extract the counts of non-defaults and defaults
+no.default <- x.table[, 2]
+default <- x.table[, 1]
+
+# Calculate default rates
+default.rate <- round(100 * default / (default + no.default), 1)
+
+# Create a data frame to store the results
+default.status.rate <- data.frame(
+  FederalReserveRegion = rownames(x.table),
+  NoDefault = no.default,
+  Default = default,
+  DefaultRate = default.rate
+)
+
+# Print the results in a table
+kable(default.status.rate)
+
+
+
+```
+
+---
+
+<h2 align="center"> Study Population </h2>
+
+Here the categories "Other" and "Philadelphia" are removed because they are much smaller in comparison to the other categories and the default rates show us that it could create an issue later 
+
+```{r}
+del.categories = c("Other") 
+# categories to be deleted in 
+# the original population
+del.obs.status = !(loan3$FederalReserveRegion %in% del.categories) 
+# deletion status. ! negation operator
+study.pop = loan3[del.obs.status,]  # excluding the categories
+kable(t(table(study.pop$FederalReserveRegion))) # Checking correctness operation
+
+dim.study=dim(study.pop)
+names(dim.study) = c("Size", " ")
+kable(t(dim.study)) 
+
+```
+
+
+---
+
+<h2 align="center"> Simple Random Sample </h2>
+
+
+Here we take the simple random sample of the study population and are given a random sample of 4000 loan applications.
+
+```{r}
+study.pop$sampling.frame = 1:length(study.pop$nGrAppv)   
+# sampling list
+# names(study.pop)                                     
+# checking the sampling list variable
+sampled.list = sample(1:length(study.pop$nGrAppv), 4000) 
+# sampling the list
+SRS.sample = study.pop[sampled.list,]                  
+# extract the sampling units (observations)
+## dimension check
+dimension.SRS = dim(SRS.sample)
+names(dimension.SRS) = c("Size", "Var.count")
+kable(t(dimension.SRS))   # checking the sample size
+```
+
+
+
+---
+
+<h2 align="center"> Systematic Sample </h2>
+
+- Similarly we take a systematic sample and get a sample size of around 4000
+
+- Randomized start value
+
+- Jump size of 145
+
+```{r}
+jump.size = dim(study.pop)[1]%/%4000  
+# find the jump size in the systematic sampling
+# jump.size
+
+rand.starting.pt=sample(1:jump.size,1) # find the random starting value
+sampling.id = seq(rand.starting.pt, dim(study.pop)[1], jump.size)  # sampling IDs
+#length(sampling.id)
+sys.sample=study.pop[sampling.id,]    
+# extract the sampling units of systematic samples
+sys.Sample.dim = dim(sys.sample)
+names(sys.Sample.dim) = c("Size", "Var.count")
+kable(t(sys.Sample.dim))
+```
+
+---
+
+<h2 align="center"> Stratified Sample </h2>
+
+
+Here we take a stratified sample using the Federal reserve region that was added to this data set. We are able to see the break down of a sample of 4000 using the federal reserve regions to explain the data 
+
+```{r}
+freq.table = table(study.pop$FederalReserveRegion)  # frequency table of strNAICS
+rel.freq = freq.table/sum(freq.table)   # relative frequency 
+strata.size = round(rel.freq*4000)      # strata size allocation
+strata.names=names(strata.size)         # extract strNAICS names for accuracy checking
+```
+
+```{r}
+kable(t(strata.size))  # make a nice-looking table using kable().
+```
+
+
+
+```{r}
+
+str(study.pop)
+
+strata.sample = study.pop[1,]    # create a reference data frame
+strata.sample$add.id = 1   # add a temporary ID to because in the loop
+                           # i =2 testing a single iteration
+for (i in 1:length(strata.names)){
+   ith.strata.names = strata.names[i]   # extract data frame names
+   ith.strata.size = strata.size[i]     # allocated stratum size
+   # The following code identifies observations to be selected
+   ith.sampling.id = which(study.pop$FederalReserveRegion==ith.strata.names) 
+   ith.strata = study.pop[ith.sampling.id,]  # i-th stratified population
+   ith.strata$add.id = 1:dim(ith.strata)[1]  # add sampling list/frame
+   # The following code generates a subset of random ID
+   ith.sampling.id = sample(1:dim(ith.strata)[1], ith.strata.size) 
+   ## Create a selection status -- pay attention to the operator: %in% 
+   ith.sample =ith.strata[ith.strata$add.id %in%ith.sampling.id,]
+   ## dim(ith.sample)         $ check the sample
+   strata.sample = rbind(strata.sample, ith.sample)  # stack all data frame!
+ }
+ # dim(strata.sample)
+ strat.sample.final = strata.sample[-1,]  # drop the temporary stratum ID
+## kable(head(strat.sample.final))         # accuracy check!
+```
+
+---
+
+<h2 align="center"> Cluster Sample  </h2>
+
+
+- Here we are using the cluster sampling method we are using Zip codes to break up the data into clusters when we look we can see we created 29880 clusters
+
+- Randomly select 4000 clusters 
+
+```{r}
+
+
+library(survey)
+
+# Create survey design object
+cluster_design <- svydesign(ids = ~Zip, data = loan2)
+
+# Specify your sampling strategy (e.g., simple random sampling)
+cluster_sample <- svydesign(ids = ~Zip, data = loan2)
+
+print(cluster_sample)
+
+# Estimate population parameters or perform analysis
+cluster_means <- svymean(~nGrAppv, cluster_design)
+
+# View results
+print(cluster_means)
+
+```
+
+### Verifying 
+
+To verify this is correct we look at the 29880 clusters with the amount of unique zip codes there are in this data set
+
+```{r}
+length(unique(loan3$Zip))
+
+```
+
+---
+
+<h2 align="center"> Default Rates  </h2>
+
+
+
+```{r caption="Population-level default rates"}
+x.table = table(loan3$FederalReserveRegion, loan3$MIS_Status)
+no.lab = x.table[,0]   # first column consists of unknown default label
+default = x.table[,1]
+no.default = x.table[,2]
+default.rate = round(100*default/(default+no.default),1)
+ default.status.rate = cbind(no.lab = no.lab, 
+                          default = default, 
+                          no.default = no.default,
+                          default.rate=default.rate)
+
+```
+
+
+
+```{r}
+ # names(SRS.sample)
+x.table = table(SRS.sample$FederalReserveRegion, SRS.sample$MIS_Status)
+no.lab.srs = x.table[,0]      # first column consists of unknown default label
+default.srs = x.table[,1]
+no.default.srs = x.table[,2]
+default.rate.srs = round(100*default.srs/(default.srs+no.default.srs),1)
+##
+region.code = names(default.rate.srs)    # extract NSICS code
+ 
+default.rate.pop = default.rate[region.code]
+# cbind(industry.code,industry.name)
+SRS.pop.rates = cbind(default.rate.pop,default.rate.srs)
+rownames(SRS.pop.rates) = region.code
+
+```
+
+
+```{r}
+x.table = table(sys.sample$FederalReserveRegion, sys.sample$MIS_Status)
+no.lab.sys = x.table[,0]      # The first column consists of an unknown default label
+default.sys = x.table[,1]
+no.default.sys = x.table[,2]
+default.rate.sys = round(100*default.sys/(default.sys+no.default.sys),1)
+sys.SRS.pop.rates = cbind(default.rate.pop, default.rate.srs, default.rate.sys)
+rownames(SRS.pop.rates) = region.code
+
+```
+
+
+
+
+
+```{r}
+#strat.sample.final
+x.table = table(strat.sample.final$FederalReserveRegion, strat.sample.final$MIS_Status)
+no.lab.str = x.table[,0]      # The first column consists of an unknown default label
+default.str = x.table[,1]
+no.default.str = x.table[,2]
+default.rate.str = round(100*default.str/(default.str+no.default.str),1)
+str.SRS.pop.rates = cbind(default.rate.pop, default.rate.srs, default.rate.sys, default.rate.str)
+rownames(str.SRS.pop.rates) = region.code
+kable(str.SRS.pop.rates)
+```
+---
+
+<h2 align="center"> Plotting the Default Rates </h2>
+
+
+
+```{r fig.width=10, fig.height=4,  caption="Improved graphics"}
+n=length(default.rate.pop)
+plot(NULL, xlim=c(0,n), ylim=c(0, 50), 
+     xlab="Federal Reserve Region", 
+     ylab ="Default Rates (Percentage)", axes=FALSE) # empty plot
+
+title("Comparison of Region-specific Default Rates Based on Random Samples")
+points(1:n, as.vector(default.rate.pop), pch=16, col="darkmagenta", cex = 0.8)
+lines(1:n, as.vector(default.rate.pop),  lty=1, col="darkmagenta", cex = 0.8)
+#
+points(1:n, as.vector(default.rate.srs), pch=17, col="chartreuse4", cex = 0.8)
+lines(1:n, as.vector(default.rate.srs), lty=1, col="chartreuse4", cex = 0.8)
+#
+points(1:n, as.vector(default.rate.sys), pch=19, col="darkblue", cex = 0.8)
+lines(1:n, as.vector(default.rate.sys), lty=1, col="darkblue", cex = 0.8)
+#
+points(1:n, as.vector(default.rate.str), pch=20, col="darkcyan", cex = 0.8)
+lines(1:n, as.vector(default.rate.str), lty=1, col="darkcyan", cex = 0.8)
+#
+axis(1,at=1:n, label=region.code)
+axis(2, las = 2)
+#
+clr = c("darkmagenta","chartreuse4","darkblue","darkcyan")
+rowMax=apply(str.SRS.pop.rates, 1, max) # max default rate in each industry
+#segments(1:n, rep(0,n), 1:n, rowMax, lty=2, col="lightgray", lwd = 0.5)
+legend(2, 45, c("Population", "Simple Random Sampling", "Systematic Sampling", "Stratified Sampling"), lty=rep(1,4), col=clr, pch=c(16,17,19,20), cex=0.6, bty="n")
+
+```
+
+
+
+---
+
+
+<h2 align="center"> Final Thoughts </h2>
+
+
+- After reviewing the data and the different sampling methods I think that though the sampling methods are all effective
+- The stratified sample and the simple random sample have closer default rates to the total population overall. - We can see in the graphic that the stratified sample follows the line more closely then the other sampling methods. 
+- For this reason and for the proportion that is left up to chance when using SRS I think that a stratified sample would be the most effective to use in our loan study. 
+
+
+
+
+---
+
+<h2 align="center"> Thank you! </h2>
+
+
+
+
