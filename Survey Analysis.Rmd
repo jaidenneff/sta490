@@ -1,0 +1,534 @@
+---
+title: "Survey Analysis"
+author: "Jaiden Neff"
+date: ""
+output:
+  html_document: 
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    fig_width: 6
+    fig_height: 4
+    fig_caption: yes
+    number_sections: yes
+    theme: readable
+  pdf_document: 
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    number_sections: yes
+    fig_width: 5
+    fig_height: 4
+  word_document: 
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    keep_md: yes
+---
+
+# Intro
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(GPArotation)
+library(psych)
+library(nFactors)
+library(rmarkdown)
+library(knitr)
+library(parameters)
+library(corrplot)
+library(ggcorrplot)
+library(ggfortify)
+require(ggplot2)
+require(GGally) 
+require(CCA)
+require(olsrr)
+require(cocron)
+opts_chunk$set(echo = TRUE, warning=FALSE, results =TRUE)
+```
+
+```{r}
+
+survey <- read.csv("https://raw.githubusercontent.com/jaidenneff/sta490/main/at-risk-survey-data.csv", header = TRUE)
+
+
+```
+
+```{r}
+my.mode = function(dataset){
+  freq.tbl = table(dataset)
+  max.freq.id=which(freq.tbl==max(freq.tbl))
+  mode=names(freq.tbl[max.freq.id])
+  as.numeric(mode)
+}
+```
+
+# Seperating Likert Scale Questions 
+
+```{r}
+
+
+
+compassion = survey[, c("q1","q2","q3", "q61","q62","q63","q7","q81", "q82", "q83", "q84", "q85", "q86", "q87","q88", "q89","q131" ,   "q132" ,   "q133"  ,  "q134"  ,  "q135"  , 
+ "q136", "q14" ,    "q15"  ,   "q16"    , "q17",     "q19"  ,   "q20", "q21"  , "q22" , "q23"    , "q24"   ,  "q25"  )]
+# Imputing with the mode in each survey item
+for (i in c("q1","q2","q3", "q61","q62","q63","q7","q81", "q82", "q83", "q84", "q85", "q86", "q87","q88", "q89","q131" ,   "q132" ,   "q133"  ,  "q134"  ,  "q135"  , 
+ "q136", "q14" ,    "q15"  ,   "q16"    , "q17",     "q19"  ,   "q20", "q21"  , "q22" , "q23"    , "q24"   ,  "q25"  )) {
+  compassion[,i][is.na(compassion[,i])]=my.mode(compassion[,i])
+}
+
+
+
+```
+
+
+
+```{r}
+
+
+gratitude = survey[, c("q41","q42","q43","q44","q45","q46","q42","q47","q48","q49","q410","q411","q412","q413","q414","q415","q416","q417","q418","q419","q420","q421", "q51","q52","q53","q54","q55","q56", "q91", "q92", "q93","q94","q95","q96", "q97", "q101"    ,"q102","q103","q104","q105","q106","q107","q108","q109","q1010","q1011","q1012" , "q1013"  
+,"q1014","q1015",   "q111.1" , "q111.2" , "q111.3" , "q112.1" , "q112.2" , "q112.3" , "q113.1" ,
+  "q113.2" , "q113.3" , "q114.1" , "q114.2" , "q114.3" , "q115.1" , "q115.2" , "q115.3" , "q116.1" , "q116.2" , "q116.3" , "q117.1" , "q117.2" , "q117.3" , "q118.1" , "q118.2" , "q118.3", "q119.1" , "q119.2" , "q119.3", "q1110.1" ,"q1110.2" ,"q1110.3", "q1111.1", "q1111.2" ,"q1111.3" , "q121" , "q122" ,  "q123"  ,  "q124"  ,  "q125" ,"q18"  )]
+# Imputing with the mode in each survey item
+for (i in c("q41","q42","q43","q44","q45","q46","q42","q47","q48","q49","q410","q411","q412","q413","q414","q415","q416","q417","q418","q419","q420","q421", "q51","q52","q53","q54","q55","q56", "q91", "q92", "q93","q94","q95","q96", "q97", "q101"    ,"q102","q103","q104","q105","q106","q107","q108","q109","q1010","q1011","q1012" , "q1013"  
+,"q1014","q1015",   "q111.1" , "q111.2" , "q111.3" , "q112.1" , "q112.2" , "q112.3" , "q113.1" ,
+  "q113.2" , "q113.3" , "q114.1" , "q114.2" , "q114.3" , "q115.1" , "q115.2" , "q115.3" , "q116.1" , "q116.2" , "q116.3" , "q117.1" , "q117.2" , "q117.3" , "q118.1" , "q118.2" , "q118.3", "q119.1" , "q119.2" , "q119.3", "q1110.1" ,"q1110.2" ,"q1110.3", "q1111.1", "q1111.2" ,"q1111.3" , "q121" , "q122" ,  "q123"  ,  "q124"  ,  "q125" ,"q18"  )) {
+  gratitude[,i][is.na(gratitude[,i])]=my.mode(gratitude[,i])
+}
+```
+
+
+
+# Give the Variable Responses Descriptive Names
+
+
+```{r}
+
+
+
+# 1. Are you a:
+compassion$q1_text <- ifelse(compassion$q1 == 1, "Freshman",
+                              ifelse(compassion$q1 == 2, "Sophomore",
+                                     ifelse(compassion$q1 == 3, "Junior",
+                                            ifelse(compassion$q1 == 4, "Senior", NA))))
+
+# 2. Did you begin college at our school or elsewhere?
+compassion$q2_text <- ifelse(compassion$q2 == 1, "Started at our school",
+                              ifelse(compassion$q2 == 2, "Started elsewhere", NA))
+
+# 3. How many credit hours are you currently taking during this semester?
+compassion$q3_text <- ifelse(compassion$q3 == 1, "Less than 12 credits",
+                              ifelse(compassion$q3 == 2, "12 credits or more", NA))
+
+
+
+
+
+# 6. Writing and Reading Load:
+# Assuming q61 to q63 correspond to 6.1 to 6.3
+for (i in 1:3) {
+  col_name <- paste0("q6", i)
+  compassion[[col_name]] <- ifelse(compassion[[col_name]] == 1, "None",
+                                    ifelse(compassion[[col_name]] == 2, "1 to 4",
+                                           ifelse(compassion[[col_name]] == 3, "5 to 10",
+                                                  ifelse(compassion[[col_name]] == 4, "11 to 20",
+                                                         ifelse(compassion[[col_name]] == 5, "more than 20", NA))))) 
+}
+
+# 7. Mark the response that best represents the extent to which your examinations
+# during the current school year have challenged you:
+compassion$q7_text <- ifelse(compassion$q7 == 1, "Extremely easy",
+                               ifelse(compassion$q7 == 2, "Easy",
+                                      ifelse(compassion$q7 == 3, "Slightly easy",
+                                             ifelse(compassion$q7 == 4, "Neither easy nor challenging",
+                                                    ifelse(compassion$q7 == 5, "Slightly challenging",
+                                                           ifelse(compassion$q7 == 6, "Challenging",
+                                                                  ifelse(compassion$q7 == 7, "Extremely challenging", "NA")))))))
+
+for (i in 1:9) {
+  col_name <- paste0("q8", i)
+  new_var_name <- paste0("q8_text", i)
+  
+  # Create a new variable for remedial experience information
+  compassion[[new_var_name]] <- ifelse(compassion[[col_name]] == 1, "I have done",
+                                       ifelse(compassion[[col_name]] == 2, "I plan to do",
+                                              ifelse(compassion[[col_name]] == 3, "I have not done nor plan to do", NA)))
+  
+
+}
+
+
+
+# 13. How Students Pay For College:
+# Assuming q131 to q136 correspond to 13.1 to 13.6
+for (i in 1:6) {
+  col_name <- paste0("q13", i)
+  compassion[[col_name]] <- ifelse(compassion[[col_name]] == 1, "Major source",
+                                    ifelse(compassion[[col_name]] == 2, "Minor source",
+                                           ifelse(compassion[[col_name]] == 3, "Not a source", NA)))
+}
+
+# 14. When do you plan to take classes at our school again?
+compassion$q14_text <- ifelse(compassion$q14 == 1, "I will accomplish my goal during this term and will not be returning",
+                               ifelse(compassion$q14 == 2, "I have no current plan to return",
+                                      ifelse(compassion$q14 == 3, "Within the next 12 months",
+                                             ifelse(compassion$q14 == 4, "Uncertain", NA))))
+
+# 15. In what range is your overall grade point average (GPA)?
+compassion$q15_text <- ifelse(compassion$q15 == 1, "<2.00",
+                               ifelse(compassion$q15 == 2, "2.00-2.66",
+                                      ifelse(compassion$q15 == 3, "2.67-3.32",
+                                             ifelse(compassion$q15 == 4, "3.33-3.66",
+                                                    ifelse(compassion$q15 == 5, "<=3.67", NA)))))
+
+# 16. How many TOTAL credit hours have you earned at our school?
+compassion$q16_text <- ifelse(compassion$q16 == 1, "None",
+                               ifelse(compassion$q16 == 2, "1-14 credits",
+                                      ifelse(compassion$q16 == 3, "15-29 credits",
+                                             ifelse(compassion$q16 == 4, "30-44 credits",
+                                                    ifelse(compassion$q16 == 5, "45-60 credits",
+                                                           ifelse(compassion$q16 == 6, "Over 60 credits", NA))))))
+
+# 17. Would you recommend our School of Business to a friend or family member?
+compassion$q17_text <- ifelse(compassion$q17 == 1, "Yes",
+                               ifelse(compassion$q17 == 2, "No", NA))
+
+
+
+# 19. Select your age group:
+compassion$q19_text <- ifelse(compassion$q19 == 1, "Under 18",
+                               ifelse(compassion$q19 == 2, "18-19",
+                                      ifelse(compassion$q19 == 3, "20-21",
+                                             ifelse(compassion$q19 == 4, "22-24",
+                                                    ifelse(compassion$q19 == 5, "24-29",
+                                                           ifelse(compassion$q19 == 6, "30-39",
+                                                                  ifelse(compassion$q19 == 7, "40-49",
+                                                                         ifelse(compassion$q19 == 8, "50-64",
+                                                                                ifelse(compassion$q19 == 9, "65+", NA)))))))))
+
+# 20. Your sex:
+compassion$q20_text <- ifelse(compassion$q20 == 1, "Male",
+                               ifelse(compassion$q20 == 2, "Female",
+                                      ifelse(compassion$q20 == 3, "Other", NA)))
+
+# 21. Do you have children who live with you?
+compassion$q21_text <- ifelse(compassion$q21 == 1, "Yes",
+                               ifelse(compassion$q21 == 2, "No", NA))
+
+# 22. Is English your native (first) language?
+compassion$q22_text <- ifelse(compassion$q22 == 1, "Yes",
+                               ifelse(compassion$q22 == 2, "No", NA))
+
+# 23. Are you an international student or a foreign national?
+compassion$q23_text <- ifelse(compassion$q23 == 1, "Yes",
+                               ifelse(compassion$q23 == 2, "No", NA))
+
+# 24. What is your racial identification?
+compassion$q24_text <- ifelse(compassion$q24 == 1, "American Indian or other Native American",
+                               ifelse(compassion$q24 == 2, "Asian, Asian American or Pacific Islander",
+                                      ifelse(compassion$q24 == 3, "Black or African American, Non-Hispanic",
+                                             ifelse(compassion$q24 == 4, "White/Caucasian, Non-Hispanic",
+                                                    ifelse(compassion$q24 == 5, "Another race/ethnicity, specify: ________",
+                                                           NA)))))
+
+```
+
+
+# Cronbach Alpha
+
+
+## Remedial Experience 
+
+
+```{r}
+###
+remedial_experience= cbind(compassion$q81, compassion$q82, compassion$q83,
+                 compassion$q84,compassion$q85,compassion$q86,compassion$q89,compassion$q89,compassion$q89)
+
+
+### Simple sum and average
+remedial_experience.sum = compassion$q81+compassion$q82+compassion$q83+
+                 compassion$q84+compassion$q85+compassion$q86+compassion$q89+compassion$q89+compassion$q89
+remedial_experience.avg = remedial_experience.sum/9
+```
+
+
+```{r fig.width = 6, fig.height = 6, fig.cap="The pairwise correlation plot reveals the potential relevance of PCA. Group items based on self-compassion and self-coldness"}
+##
+
+if (!requireNamespace("corrplot", quietly = TRUE)) {
+  install.packages("corrplot")
+}
+library(corrplot)
+
+M=cor(cbind(remedial_experience))
+corrplot.mixed(M, lower.col = "purple", upper = "ellipse", number.cex = .7, tl.cex = 0.7)
+```
+
+Here you can see the association between the different remedial experience questions in this heat map 
+
+
+```{r}
+
+library(psych)
+library(kableExtra)
+
+cronbach.gr = alpha(remedial_experience, n.iter=1000)$boot.ci
+
+kable(cronbach.gr, caption="Confodence Interval of Cranbach Alpha")
+
+```
+
+
+
+We can see that Cronbach's alpha is 0.87 with a 95% confidence interval (0.856, 0.8982) suggesting that the items in the self-compassion instrument have relatively high internal consistency. 
+
+
+## Learning Engagement 
+
+
+
+```{r fig.cap="The pairwise correlation plot reveals the potential relevance of PCA for the gratitude instrument. The shape of an ellipse represents the correlation. The skinnier the ellipse, the higher the correlation. The direction reflects whether a correlation is positive or negative. The off-diagonal direction implies s positive correlation while the main diagonal direction implies a negative association."}
+
+learning_engagement <- cbind(
+  gratitude$q41, gratitude$q42, gratitude$q43,
+  gratitude$q44, gratitude$q45, gratitude$q46,
+  gratitude$q47, gratitude$q48, gratitude$q49,
+  gratitude$q410, gratitude$q411, gratitude$q412,
+  gratitude$q413, gratitude$q414, gratitude$q415,
+  gratitude$q416, gratitude$q417, gratitude$q418,
+  gratitude$q419, gratitude$q420, gratitude$q421
+)
+# Convert learning_engagement to a matrix
+learning_engagement_matrix <- as.matrix(learning_engagement)
+
+# Calculate the correlation matrix
+M1 <- cor(learning_engagement)
+
+# Plot the mixed correlation plot
+corrplot.mixed(M1, lower.col = "purple", upper = "ellipse", number.cex = 0.7, tl.cex = 0.7)
+
+```
+
+Here you can see the association between the different learning engagement questions in this heat map. 
+
+
+```{r}
+
+library(psych)
+library(kableExtra)
+
+cronbach.grL = alpha(learning_engagement, n.iter=1000)$boot.ci
+
+kable(cronbach.grL, caption="Confodence Interval of Cranbach Alpha")
+
+```
+
+
+We can see that Cronbach's alpha is 0.859 with a 95% confidence interval (0.8304, 0.883) also suggesting that the items in the Learning Engagement rating instrument have relatively high internal consistency. 
+
+
+# PCA
+
+
+## Set-Up
+
+
+```{r}
+My.plotnScree = function(mat, legend = TRUE, method ="factors", main){
+    # mat = data matrix
+    # method = c("factors", "components"), default is "factors".
+    # main = title of the plot
+    ev <- eigen(cor(mat))    # get eigenvalues
+    ap <- parallel(subject=nrow(mat),var=ncol(mat), rep=5000,cent=.05)
+    nScree = nScree(x=ev$values, aparallel=ap$eigen$qevpea, model=method)  
+    ##
+    if (!inherits(nScree, "nScree")) 
+        stop("Method is only for nScree objects")
+    if (nScree$Model == "components") 
+        nkaiser = "Eigenvalues > mean: n = "
+    if (nScree$Model == "factors") 
+      nkaiser = "Eigenvalues > zero: n = "
+    # axis labels
+    xlab = nScree$Model
+    ylab = "Eigenvalues"
+    ##
+    par(col = 1, pch = 18)
+    par(mfrow = c(1, 1))
+    eig <- nScree$Analysis$Eigenvalues
+    k <- 1:length(eig)
+    plot(1:length(eig), eig, type="b", main = main, 
+        xlab = xlab, ylab = ylab, ylim=c(0, 1.2*max(eig)))
+    #
+    nk <- length(eig)
+    noc <- nScree$Components$noc
+    vp.p <- lm(eig[c(noc + 1, nk)] ~ k[c(noc + 1, nk)])
+    x <- sum(c(1, 1) * coef(vp.p))
+    y <- sum(c(1, nk) * coef(vp.p))
+    par(col = 10)
+    lines(k[c(1, nk)], c(x, y))
+    par(col = 11, pch = 20)
+    lines(1:nk, nScree$Analysis$Par.Analysis, type = "b")
+    if (legend == TRUE) {
+        leg.txt <- c(paste(nkaiser, nScree$Components$nkaiser), 
+                   c(paste("Parallel Analysis: n = ", nScree$Components$nparallel)), 
+                   c(paste("Optimal Coordinates: n = ", nScree$Components$noc)), 
+                   c(paste("Acceleration Factor: n = ", nScree$Components$naf))
+                   )
+        legend("topright", legend = leg.txt, pch = c(18, 20, NA, NA), 
+                           text.col = c(1, 3, 2, 4), 
+                           col = c(1, 3, 2, 4), bty="n", cex=0.7)
+    }
+    naf <- nScree$Components$naf
+    text(x = noc, y = eig[noc], label = " (OC)", cex = 0.7, 
+        adj = c(0, 0), col = 2)
+    text(x = naf + 1, y = eig[naf + 1], label = " (AF)", 
+        cex = 0.7, adj = c(0, 0), col = 4)
+}
+# example
+# My.plotnScree(mat=compassion, legend = TRUE, method ="factors", 
+#              main = "Number of Factors to Retain")
+```
+
+
+```{r}
+My.loadings.var <- function(mat, nfct, method="fa"){
+   # mat =  data matrix
+   # nfct = number of factors or components
+   # method = c("fa", "pca"), default = is "fa".
+    if(method == "fa"){ 
+     f1 <- factanal(mat, factors = nfct,  rotation = "varimax")
+     x <- loadings(f1)
+     vx <- colSums(x^2)
+     varSS = rbind('SS loadings' = vx,
+            'Proportion Var' = vx/nrow(x),
+           'Cumulative Var' = cumsum(vx/nrow(x)))
+     weight = f1$loadings[] 
+   } else if (method == "pca"){
+     pca <- prcomp(mat, center = TRUE, scale = TRUE)
+     varSS = summary(pca)$importance[,1:nfct]
+     weight = pca$rotation[,1:nfct]
+  }
+    list(Loadings = weight, Prop.Var = varSS)
+}
+# example
+# My.loadings.var(mat, nfct=3, method="pca")
+```
+
+
+## Remedial Experience 
+
+
+```{r fig.cap = "Different methods of identification of the number of principal components to be retained in exploratory analysis: Kaiser's eigenvalue rule, Raiche et al Monte Carlo simulation method (parallel analysis),  optimal coordinate (OC) index, and accelerate factor (AF) method.", fig.height = 4, fig.width=5}
+My.plotnScree(mat=remedial_experience, legend = TRUE, method ="components", 
+              main="Determination of Number of Components\n remedial experience")
+
+```
+
+Here we see the Number of Components for remedial experience that we will use for pca
+
+```{r}
+Loadings = My.loadings.var(mat=remedial_experience, nfct=2, method="pca")$Loadings
+# pca loadings
+kable(round(Loadings,3),
+    caption="Factor loadings of the first few PCAs and the cumulative
+    the proportion of variation explained by the corresponding PCAs in the 
+    Gratitude Questionaire Survey.")
+```
+
+
+
+```{r}
+VarProp = My.loadings.var(mat=remedial_experience, nfct=2, method="pca")$Prop.Var
+# pca loadings
+kable(round(VarProp,3),
+    caption="Cumulative and proportion of variances explained by each 
+    the principal component in remedial experience question.")
+```
+
+
+
+```{r fig.cap = "Histogram of the first principle component extract from the self-compassion survey. "}
+pca <- prcomp(remedial_experience, center = TRUE, scale = TRUE)
+sc.idx = pca$x[,1]
+# hist(sc.idx, breaks=10, main="Distribution of Self-compassion Index")
+##
+hist(sc.idx,
+main="Distribution of Remedial Experience Index",
+breaks = seq(min(sc.idx), max(sc.idx), length=9),
+xlab="Remedial Experience Index",
+xlim=range(sc.idx),
+border="red",
+col="lightblue",
+freq=FALSE
+)
+```
+
+As you can see here the Remedial Experience Index is skewed severely left 
+
+
+## Learning Engagement 
+
+
+
+```{r fig.cap = "Different methods of identification of the number of principal components to be retained in exploratory analysis for the gratitude survey instrument: Kaiser's eigenvalue rule, Raiche et al Monte Carlo simulation method (parallel analysis),  optimal coordinate (OC) index, and accelerate factor (AF) method.", fig.height = 4, fig.width=5}
+My.plotnScree(mat=learning_engagement, legend = TRUE, method ="components", 
+              main="Determination of Number of Components\n learning engagement")
+```
+
+Here we see the Number of Components for learning engagement that we will use for pca
+
+```{r}
+Loadings = My.loadings.var(mat=learning_engagement, nfct=2, method="pca")$Loadings
+# pca loadings
+kable(round(Loadings,3),
+    caption="Factor loadings of the first few PCAs and the cumulative
+    the proportion of variation explained by the corresponding PCAs in the 
+    learning engagement survey.")
+```
+
+
+```{r}
+VarProp = My.loadings.var(mat=learning_engagement, nfct=5, method="pca")$Prop.Var
+# pca loadings
+kable(round(VarProp,3),
+    caption="Cumulative and proportion of variances explained by each 
+    principle component from the Learning Engagement Survey.")
+```
+
+
+```{r fig.cap="Histograms of the gratitude index scores. The distribution of the gratitude index is skewed to the left. We will perform a Box-Cox transformation to fix the distributional issue in the regression residuals." }
+gr.pca <- prcomp(learning_engagement, center = TRUE, scale = TRUE)
+gr.idx = gr.pca$x[,1]
+###
+hist(gr.idx,
+main="Untransformed Learning Engagement Index",
+breaks = seq(min(gr.idx), max(gr.idx), length=10),
+xlab="Learning Engagement Index",
+xlim=range(gr.idx),
+border="red",
+col="lightblue",
+freq=FALSE
+)
+```
+As you can see the Learning Engagement index is skewed to the right 
+
+
+## Pair-wise correlation 
+
+```{r fig.height=7, fig.width=7, fig.cap = "Pair-wise correlation plot between individual survey items and the two first PCA scores extract from the two instruments."}
+M1=cor(cbind(gr.idx, remedial_experience, sc.idx, learning_engagement))
+#corrplot(M, type = "upper", method = "ellipse", main="Pairwise Correlation Plot: Self-Compassion Scale")
+corrplot.mixed(M1, lower.col = "purple", upper = "ellipse", number.cex = .7, tl.cex = 0.7)
+```
+
+
+
+
+
+
+
+
+
+
+
