@@ -1,0 +1,72 @@
+---
+title: "My Portfolio"
+author: "Jaiden Neff"
+date: "West Chester University Graduate"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    fig_width: 6
+    fig_height: 4
+    fig_caption: yes
+    theme: readable
+  pdf_document:
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    number_sections: false
+    fig_width: 5
+    fig_height: 4
+  word_document:
+    toc: yes
+    toc_depth: 4
+    fig_caption: yes
+    keep_md: yes
+---
+
+
+
+# About Me 
+
+Here you will find my cover letter with some information about me and a breif discription of my portfolio and my resume 
+
+<img src="https://jaidenneff.github.io/Portfolio/JaidenPic.png" alt="Jaiden Picture" style="width: 50%;">
+
+
+[Cover Letter](https://jaidenneff.github.io/Portfolio/)
+
+[Resume](https://jaidenneff.github.io/Portfolio/Jaiden_Neff_Resume (2).pdf)
+
+# Churn Analysis
+
+This is a churn analysis that I completed for the company I was interning at in this past summer. I found some great information and was able to present my findings. 
+
+[Churn Analysis](https://jaidenneff.github.io/Portfolio/Churn Analysis 2022-23 (1).pdf)
+
+
+# Ram Poll
+
+This is Report I helped to complete for a Political Polling Independent Study for the 2022 election. 
+
+[Ram Poll](https://jaidenneff.github.io/Portfolio/Ram Poll Report 2022.pdf)
+
+
+# JRA Poster
+
+This is scientific poster I created to show my finding in an Independent Study that worked towards compiling and analyzing satisfaction surveys for the Jewish Relief Agency.
+
+[JRA Poster](https://jaidenneff.github.io/Portfolio/Final Poster JRA.pdf)
+
+
+# Investigative Field Essay
+
+This is an Essay I completed for a Technical Writing course about big data and how effective it can be when utialized.
+
+[Essay](https://jaidenneff.github.io/Portfolio/Investigative Field Essay Jaiden Neff Final Draft.docx)
+
+# Regression Report 
+
+This is a Regression Report I created for A mathematical coding course. 
+
+[Resume](https://jaidenneff.github.io/Portfolio/Multiple Linear Regression Report.pdf)
