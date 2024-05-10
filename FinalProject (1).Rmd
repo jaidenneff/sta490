@@ -1,0 +1,528 @@
+---
+title: "Employee Involvement"
+subtitle: ''
+author: Gianna LaFrance, Jaiden Neff, & Samantha Gouveia
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+
+style_mono_light(
+  header_font_google = google_font("Open Sans", "300"),
+  text_font_google   = google_font("Lato", "400"),
+  code_font_google   = google_font("IBM Plex Mono"),
+  base_color = "#1F7799")
+
+```
+
+
+<h1 align = "center"> Table of Contents </h1>
+<center><font size="7">  
+- Introduction <br>
+- Exploratory Data Analysis <br>
+- Principal Componenet Analysis <br>
+- Multinomial Logistic Regression <br>
+- Conclusion & Discussion
+</font></center>
+
+---
+
+## Introduction
+
+Our goal for this study is to see the effect that factors have on the overall job involvement at our company. We plan to run statistical tests and observe the data to draw conclusions that will lead us to make informed decisions about how to improve job involvement. 
+
+The data set has 1470 rows and 35 columns.  
+
+We will be focusing on the following variables for our exploratory data analysis and we will keep these for our sample population.
+
+- Job Involvement: Likert scale 1-4 from low to very high
+- Environment Satisfaction: Likert scale 1-4 from low to very high
+- Job Satisfaction: Likert scale 1-4 from low to very high
+- Work Life Balance:Likert scale 1-4 from low to very high
+- Monthly Income:
+- Years Since Last Promotion:
+- Years At Company:
+- Age:
+- Number Companies Worked:
+- Department:
+- Job Level:
+- Years With Current Manager:
+- Hourly Rate:
+
+
+```{r}
+
+employee <- read.csv("https://raw.githubusercontent.com/anafrance/FinalProject/main/EmployeeAttritionData.csv", header=TRUE)
+
+library(tidyverse)
+employee1 <- employee %>% 
+  dplyr::select(JobInvolvement, JobSatisfaction, EnvironmentSatisfaction, HourlyRate)
+
+
+```
+
+---
+class: inverse center middle
+
+# Exploratory Data Analysis
+
+
+---
+
+## Job Involvement Data
+
+```{r}
+
+# Print title for frequency distribution of job involvement
+cat("Frequency Distribution of Job Involvement:\n")
+
+# Display frequency distribution table of job involvement
+print(table(employee$JobInvolvement))
+
+
+# Frequency graph for Job Involvement
+barplot(table(employee$JobInvolvement), main = "Job Involvement", xlab = "Level of Involvement", ylab = "Frequency")
+
+```
+
+---
+
+## Frequency Graphics
+
+```{r}
+# Frequency graph for Job Involvement
+barplot(table(employee$EnvironmentSatisfaction), main = "Environment Satisfaction", xlab = "Level of Involvement", ylab = "Frequency")
+```
+
+---
+
+## Frequency Graphics
+
+```{r}
+
+# Frequency graph for Job Involvement
+barplot(table(employee$JobSatisfaction), main = "Job Satisfaction", xlab = "Level of Involvement", ylab = "Frequency")
+
+
+```
+
+
+---
+
+## Summary Statistics
+
+```{r}
+
+# Summary statistics with titles for each factor
+
+# HourlyRate
+cat("\nSummary statistics for Hourly Rate:\n")
+summary(employee$HourlyRate)
+
+# Years Since Last Promotion
+cat("\nSummary statistics for Years Since Last Promotion:\n")
+summary(employee$YearsSinceLastPromotion)
+
+# Age
+cat("\nSummary statistics for Age:\n")
+summary(employee$Age)
+
+# Number of Companies Worked For
+cat("\nSummary statistics for Number of Companies Worked For:\n")
+summary(employee$NumCompaniesWorked)
+
+```
+
+---
+
+## Scatter Plot for Age 
+
+```{r}
+
+# Create a scatter plot of age and job involvement
+plot(employee$Age, employee$JobInvolvement,
+     xlab = "Age", ylab = "Job Involvement",
+     main = "Scatter Plot of Age and Job Involvement")
+
+
+```
+
+---
+
+## Job Involvemnet and Satisfaction 
+
+```{r}
+
+# Create a contingency table of job involvement and job satisfaction
+contingency_table <- table(employee$JobInvolvement, employee$JobSatisfaction)
+
+# Convert the contingency table into a data frame
+df <- as.data.frame.matrix(contingency_table)
+
+# Set the row names as the levels of job involvement
+row.names(df) <- levels(employee$JobInvolvement)
+
+# Set the colors for the bars
+bar_colors <- c("skyblue", "pink", "orange", "green")
+
+# Plot a clustered bar chart
+barplot(as.matrix(df), beside = TRUE, col = bar_colors,
+        main = "Clustered Bar Chart of Job Involvement vs. Job Satisfaction",
+        xlab = "Job Involvement", ylab = "Frequency",
+        legend.text = TRUE)
+
+```
+
+
+---
+
+## Department
+
+
+```{r}
+
+# Create a barplot to visualize job involvement across departments
+barplot(table(employee$Department, employee$JobInvolvement),
+        beside = TRUE,
+        legend.text = TRUE,
+        main = "Job Involvement Across Departments",
+        xlab = "Involvemnet",
+        ylab = "Frequency",
+        col = c("skyblue", "pink", "magenta") # Color of the bars
+)
+
+```
+
+---
+
+## Correlation Plot 
+
+```{r}
+
+# Load required libraries
+library(corrplot)
+
+# Select relevant columns for correlation analysis
+selected_cols <- c("JobInvolvement", "EnvironmentSatisfaction", "JobSatisfaction", 
+                   "MonthlyIncome", "YearsSinceLastPromotion", "YearsAtCompany", 
+                   "WorkLifeBalance", "Age", "NumCompaniesWorked", "JobLevel", "YearsWithCurrManager", "HourlyRate")
+
+# Create correlation matrix
+correlation_matrix <- cor(employee[, selected_cols])
+
+# Plot correlation matrix with clearer labels and larger font size
+corrplot(correlation_matrix, method = "circle", type = "upper",
+         tl.col = "black", tl.srt = 45,
+         title = "Correlation Matrix of Employee Factors",
+         tl.cex = 0.8, # Set text label size
+         cl.cex = 0.8, # Set color legend label size
+         mar = c(1,1,1,1) # Set margin size
+)
+
+```
+
+---
+
+## Correlation Coefficents
+
+```{r}
+
+# Calculate correlations between JobInvolvement and other variables
+correlation_with_job_involvement <- cor(employee[, selected_cols])["JobInvolvement", ]
+
+# Print correlation coefficients and their significance levels
+print(correlation_with_job_involvement)
+
+```
+
+
+---
+
+## Findings 
+
+We found that there are not that many factors that are highly correlated with Job Involvement there are a few however that have higher correlations and that we will be including in the Final Model 
+
+Multicollinearity in monthly income and job level and Years at Company and Years with Current Manager so we removed these factors because they were not significant on their own 
+
+Monthly Income and Hourly Rate are not correlated which I thought was interesting 
+
+A lot of the variables are more highly correlated to each other than they are to the variable Job Involvement 
+
+
+---
+class: inverse center middle
+
+# Principal Component Analysis
+
+
+---
+name: colors
+
+## PCA
+
+```{r}
+eng <- employee
+library(tidyverse)
+engage <- eng %>% 
+  dplyr::select(YearsAtCompany,YearsSinceLastPromotion, JobInvolvement, JobSatisfaction, WorkLifeBalance, Age, NumCompaniesWorked,  MonthlyIncome)
+```
+
+```{r}
+my.mode = function(dataset){
+  freq.tbl = table(dataset)
+  max.freq.id=which(freq.tbl==max(freq.tbl))
+  mode=names(freq.tbl[max.freq.id])
+  as.numeric(mode)
+}
+```
+
+```{r}
+
+My.plotnScree = function(mat, legend = TRUE, method ="factors", main){
+
+    ev <- eigen(cor(mat))    # get eigenvalues
+    ap <- parallel(subject=nrow(mat),var=ncol(mat), rep=5000,cent=.05)
+    nScree = nScree(x=ev$values, aparallel=ap$eigen$qevpea, model=method)  
+    ##
+    if (!inherits(nScree, "nScree")) 
+        stop("Method is only for nScree objects")
+    if (nScree$Model == "components") 
+        nkaiser = "Eigenvalues > mean: n = "
+    if (nScree$Model == "factors") 
+      nkaiser = "Eigenvalues > zero: n = "
+    # axis labels
+    xlab = nScree$Model
+    ylab = "Eigenvalues"
+    ##
+    par(col = 1, pch = 18, bg=NA)
+    par(mfrow = c(1, 1))
+    eig <- nScree$Analysis$Eigenvalues
+    k <- 1:length(eig)
+    plot(1:length(eig), eig, type="b", main = main, 
+        xlab = xlab, ylab = ylab, ylim=c(0, 1.2*max(eig)))
+    #
+    nk <- length(eig)
+    noc <- nScree$Components$noc
+    vp.p <- lm(eig[c(noc + 1, nk)] ~ k[c(noc + 1, nk)])
+    x <- sum(c(1, 1) * coef(vp.p))
+    y <- sum(c(1, nk) * coef(vp.p))
+    par(col = 10)
+    lines(k[c(1, nk)], c(x, y))
+    par(col = 11, pch = 20)
+    lines(1:nk, nScree$Analysis$Par.Analysis, type = "b")
+    if (legend == TRUE) {
+        leg.txt <- c(paste(nkaiser, nScree$Components$nkaiser), 
+                   c(paste("Parallel Analysis: n = ", nScree$Components$nparallel)), 
+                   c(paste("Optimal Coordinates: n = ", nScree$Components$noc)), 
+                   c(paste("Acceleration Factor: n = ", nScree$Components$naf))
+                   )
+        legend("topright", legend = leg.txt, pch = c(18, 20, NA, NA), 
+                           text.col = c(1, 3, 2, 4), 
+                           col = c(1, 3, 2, 4), bty="n", cex=0.7)
+    }
+    naf <- nScree$Components$naf
+    text(x = noc, y = eig[noc], label = " (OC)", cex = 0.7, 
+        adj = c(0, 0), col = 2)
+    text(x = naf + 1, y = eig[naf + 1], label = " (AF)", 
+        cex = 0.7, adj = c(0, 0), col = 4)
+}
+```
+
+```{r factor loadings}
+
+My.loadings.var <- function(mat, nfct, method="fa"){
+   # mat =  data matrix
+   # nfct = number of factors or components
+   # method = c("fa", "pca"), default = is "fa".
+    if(method == "fa"){ 
+     f1 <- factanal(mat, factors = nfct,  rotation = "varimax")
+     x <- loadings(f1)
+     vx <- colSums(x^2)
+     varSS = rbind('SS loadings' = vx,
+            'Proportion Var' = vx/nrow(x),
+           'Cumulative Var' = cumsum(vx/nrow(x)))
+     weight = f1$loadings[] 
+   } else if (method == "pca"){
+     pca <- prcomp(mat, center = TRUE, scale = TRUE)
+     varSS = summary(pca)$importance[,1:nfct]
+     weight = pca$rotation[,1:nfct]
+  }
+    list(Loadings = weight, Prop.Var = varSS)
+}
+
+```
+
+
+```{r}
+library(GPArotation)
+library(psych)
+library(nFactors)
+library(rmarkdown)
+library(knitr)
+library(parameters)
+library(corrplot)
+library(ggcorrplot)
+library(ggfortify)
+
+JobInvolvement <- engage
+My.plotnScree(mat=JobInvolvement, legend = TRUE, method ="components", 
+              main="Determination of Job Involvement")
+```
+
+---
+name: colors
+
+## Factor Loading
+
+```{r}
+
+Loadings = My.loadings.var(mat=JobInvolvement, nfct=2, method="pca")$Loadings
+#
+# pca loadings
+kable(round(Loadings,3),
+  caption="Factor loadings of the first few PCAs and the cumulative proportion
+of variation explained by the corresponding PCAs in the employee survey.")
+```
+
+---
+
+## Proportion of Variation Explained
+
+```{r}
+VarProp = My.loadings.var(mat=JobInvolvement, nfct=2, method="pca")$Prop.Var
+# pca loadings
+kable(round(VarProp,3),
+    caption="Cumulative and proportion of variances explained by each 
+    the principal component in the employee survey.")
+```
+
+---
+class: inverse center middle
+
+# Multinomial Logistic Regression
+
+---
+name: colors
+
+## MLR
+
+We used the 4th level as the baseline for Job Involvement.
+
+First, we did a model with all of our variables: 
+- Environment Satisfaction: Likert scale 1-4 from low to very high
+- Job Satisfaction: Likert scale 1-4 from low to very high
+- Work Life Balance:Likert scale 1-4 from low to very high
+- Years Since Last Promotion:
+- Age:
+- Number Companies Worked:
+- Department:
+- Hourly Rate:
+
+The only variables that were statistically significant were Job Satisfaction, Environment Satisfaction, and Hourly Rate.
+
+---
+name: colors
+
+## Model
+
+```{css, echo=FALSE}
+pre {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+```
+
+```{r}
+# Fit a multinomial logistic regression model 
+library(VGAM)
+fit <- vglm(JobInvolvement ~ ., 
+            data = employee1, 
+            family = multinomial) 
+
+```
+
+```{css, echo=FALSE}
+.scroll-100 {
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: inherit;
+}
+```
+
+```{r, class.output="scroll-100"}
+print(summary(fit))
+```
+
+---
+
+## Model Assumptions
+
+One assumption that needs to be tested is collinearity betweeen the explanatory varibles. 
+
+```{r}
+library(corrplot)
+
+cor <- employee1 %>% 
+  dplyr::select(JobInvolvement, JobSatisfaction, EnvironmentSatisfaction, HourlyRate)
+
+corrplot(cor(cor), method = "number",tl.cex = 0.6, bg=)
+
+```
+
+
+---
+name: colors
+
+## Conclusion
+
+Not as many variables were correlated/significant in predicting Job Involvement. 
+
+Some of our variables were even negatively correlated.
+
+Job Satisfaction, Environment Satisfaction, and Hourly Rate were significant at the 0.1 alpha level.
+
+Job Involvement is self reported so we might not have accurate data which would lead to these low correlations because of the bias
+
+Continued work: restructuring PCs to include in the model to get better estimates. 
+
+Suggestions: We could measure Job Involvement in other ways such as hours worked or projects completed in the last 6 months. We could also make the survey anonymous so that people feel more comfortable reporting accurately without fear of losing their job. 
+
+---
+
+## Contributions
+
+Introduction and Exploratory Analysis ~ Jaiden
+
+PCA ~ Samantha
+
+Multinomial Logistic Regression ~ Gianna
+
+
+
+

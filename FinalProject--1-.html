@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Employee Involvement</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gianna LaFrance, Jaiden Neff, &amp; Samantha Gouveia" />
+    <script src="FinalProject--1-_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Employee Involvement
+]
+.author[
+### Gianna LaFrance, Jaiden Neff, &amp; Samantha Gouveia
+]
+
+---
+
+
+
+
+
+
+
+&lt;h1 align = "center"&gt; Table of Contents &lt;/h1&gt;
+&lt;center&gt;&lt;font size="7"&gt;  
+- Introduction &lt;br&gt;
+- Exploratory Data Analysis &lt;br&gt;
+- Principal Componenet Analysis &lt;br&gt;
+- Multinomial Logistic Regression &lt;br&gt;
+- Conclusion &amp; Discussion
+&lt;/font&gt;&lt;/center&gt;
+
+---
+
+## Introduction
+
+Our goal for this study is to see the effect that factors have on the overall job involvement at our company. We plan to run statistical tests and observe the data to draw conclusions that will lead us to make informed decisions about how to improve job involvement. 
+
+The data set has 1470 rows and 35 columns.  
+
+We will be focusing on the following variables for our exploratory data analysis and we will keep these for our sample population.
+
+- Job Involvement: Likert scale 1-4 from low to very high
+- Environment Satisfaction: Likert scale 1-4 from low to very high
+- Job Satisfaction: Likert scale 1-4 from low to very high
+- Work Life Balance:Likert scale 1-4 from low to very high
+- Monthly Income:
+- Years Since Last Promotion:
+- Years At Company:
+- Age:
+- Number Companies Worked:
+- Department:
+- Job Level:
+- Years With Current Manager:
+- Hourly Rate:
+
+
+
+
+---
+class: inverse center middle
+
+# Exploratory Data Analysis
+
+
+---
+
+## Job Involvement Data
+
+
+```
+## Frequency Distribution of Job Involvement:
+```
+
+```
+## 
+##   1   2   3   4 
+##  83 375 868 144
+```
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+
+---
+
+## Frequency Graphics
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-3-1.png" width="100%" /&gt;
+
+---
+
+## Frequency Graphics
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-4-1.png" width="100%" /&gt;
+
+
+---
+
+## Summary Statistics
+
+
+```
+## 
+## Summary statistics for Hourly Rate:
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   30.00   48.00   66.00   65.89   83.75  100.00
+```
+
+```
+## 
+## Summary statistics for Years Since Last Promotion:
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.000   0.000   1.000   2.188   3.000  15.000
+```
+
+```
+## 
+## Summary statistics for Age:
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   18.00   30.00   36.00   36.92   43.00   60.00
+```
+
+```
+## 
+## Summary statistics for Number of Companies Worked For:
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.000   1.000   2.000   2.693   4.000   9.000
+```
+
+---
+
+## Scatter Plot for Age 
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-6-1.png" width="100%" /&gt;
+
+---
+
+## Job Involvemnet and Satisfaction 
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-7-1.png" width="100%" /&gt;
+
+
+---
+
+## Department
+
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-8-1.png" width="100%" /&gt;
+
+---
+
+## Correlation Plot 
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
+
+---
+
+## Correlation Coefficents
+
+
+```
+##          JobInvolvement EnvironmentSatisfaction         JobSatisfaction 
+##             1.000000000            -0.008277598            -0.021475910 
+##           MonthlyIncome YearsSinceLastPromotion          YearsAtCompany 
+##            -0.015271491            -0.024184292            -0.021355427 
+##         WorkLifeBalance                     Age      NumCompaniesWorked 
+##            -0.014616593             0.029819959             0.015012413 
+##                JobLevel    YearsWithCurrManager              HourlyRate 
+##            -0.012629883             0.025975808             0.042860641
+```
+
+
+---
+
+## Findings 
+
+We found that there are not that many factors that are highly correlated with Job Involvement there are a few however that have higher correlations and that we will be including in the Final Model 
+
+Multicollinearity in monthly income and job level and Years at Company and Years with Current Manager so we removed these factors because they were not significant on their own 
+
+Monthly Income and Hourly Rate are not correlated which I thought was interesting 
+
+A lot of the variables are more highly correlated to each other than they are to the variable Job Involvement 
+
+
+---
+class: inverse center middle
+
+# Principal Component Analysis
+
+
+---
+name: colors
+
+## PCA
+
+
+
+
+
+
+
+
+
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-14-1.png" width="100%" /&gt;
+
+---
+name: colors
+
+## Factor Loading
+
+
+Table: Factor loadings of the first few PCAs and the cumulative proportion
+of variation explained by the corresponding PCAs in the employee survey.
+
+|                        |    PC1|    PC2|
+|:-----------------------|------:|------:|
+|YearsAtCompany          | -0.539|  0.327|
+|YearsSinceLastPromotion | -0.475|  0.328|
+|JobInvolvement          |  0.013| -0.143|
+|JobSatisfaction         |  0.017|  0.137|
+|WorkLifeBalance         | -0.013|  0.062|
+|Age                     | -0.440| -0.426|
+|NumCompaniesWorked      | -0.102| -0.737|
+|MonthlyIncome           | -0.528| -0.133|
+
+---
+
+## Proportion of Variation Explained
+
+
+Table: Cumulative and proportion of variances explained by each 
+    the principal component in the employee survey.
+
+|                       |   PC1|   PC2|
+|:----------------------|-----:|-----:|
+|Standard deviation     | 1.510| 1.133|
+|Proportion of Variance | 0.285| 0.160|
+|Cumulative Proportion  | 0.285| 0.445|
+
+---
+class: inverse center middle
+
+# Multinomial Logistic Regression
+
+---
+name: colors
+
+## MLR
+
+We used the 4th level as the baseline for Job Involvement.
+
+First, we did a model with all of our variables: 
+- Environment Satisfaction: Likert scale 1-4 from low to very high
+- Job Satisfaction: Likert scale 1-4 from low to very high
+- Work Life Balance:Likert scale 1-4 from low to very high
+- Years Since Last Promotion:
+- Age:
+- Number Companies Worked:
+- Department:
+- Hourly Rate:
+
+The only variables that were statistically significant were Job Satisfaction, Environment Satisfaction, and Hourly Rate.
+
+---
+name: colors
+
+## Model
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+&lt;style type="text/css"&gt;
+.scroll-100 {
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: inherit;
+}
+&lt;/style&gt;
+
+
+```{.scroll-100}
+## 
+## Call:
+## vglm(formula = JobInvolvement ~ ., family = multinomial, data = employee1)
+## 
+## Coefficients: 
+##                            Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept):1             -0.618707   0.704149  -0.879 0.379586    
+## (Intercept):2              1.063167   0.497672   2.136 0.032656 *  
+## (Intercept):3              1.569505   0.457687   3.429 0.000605 ***
+## JobSatisfaction:1          0.217457   0.128412   1.693 0.090373 .  
+## JobSatisfaction:2          0.017965   0.088588   0.203 0.839295    
+## JobSatisfaction:3          0.075419   0.081347   0.927 0.353856    
+## EnvironmentSatisfaction:1 -0.007483   0.124508  -0.060 0.952078    
+## EnvironmentSatisfaction:2  0.148697   0.089249   1.666 0.095693 .  
+## EnvironmentSatisfaction:3  0.142680   0.081670   1.747 0.080630 .  
+## HourlyRate:1              -0.007772   0.006846  -1.135 0.256260    
+## HourlyRate:2              -0.008251   0.004883  -1.690 0.091059 .  
+## HourlyRate:3              -0.005292   0.004486  -1.180 0.238188    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Names of linear predictors: log(mu[,1]/mu[,4]), log(mu[,2]/mu[,4]), 
+## log(mu[,3]/mu[,4])
+## 
+## Residual deviance: 3072.792 on 4398 degrees of freedom
+## 
+## Log-likelihood: -1536.396 on 4398 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 5 
+## 
+## No Hauck-Donner effect found in any of the estimates
+## 
+## 
+## Reference group is level  4  of the response
+```
+
+---
+
+## Model Assumptions
+
+One assumption that needs to be tested is collinearity betweeen the explanatory varibles. 
+
+&lt;img src="FinalProject--1-_files/figure-html/unnamed-chunk-21-1.png" width="100%" /&gt;
+
+
+---
+name: colors
+
+## Conclusion
+
+Not as many variables were correlated/significant in predicting Job Involvement. 
+
+Some of our variables were even negatively correlated.
+
+Job Satisfaction, Environment Satisfaction, and Hourly Rate were significant at the 0.1 alpha level.
+
+Job Involvement is self reported so we might not have accurate data which would lead to these low correlations because of the bias
+
+Continued work: restructuring PCs to include in the model to get better estimates. 
+
+Suggestions: We could measure Job Involvement in other ways such as hours worked or projects completed in the last 6 months. We could also make the survey anonymous so that people feel more comfortable reporting accurately without fear of losing their job. 
+
+---
+
+## Contributions
+
+Introduction and Exploratory Analysis ~ Jaiden
+
+PCA ~ Samantha
+
+Multinomial Logistic Regression ~ Gianna
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
